@@ -5,7 +5,7 @@
 
     <groupId>com.nlocketz.plugins.it</groupId>
     <artifactId>simple-it</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
 
     <description>A simple IT verifying the basic use case.</description>
 
@@ -48,7 +48,7 @@
                             <contentPlugin>
                                 <groupId>@project.groupId@</groupId>
                                 <artifactId>echo-string-maven-plugin</artifactId>
-                                <version>@project.version@</version>
+                                <version>0.0.1-SNAPSHOT</version>
                                 <executions>
                                     <execution>
                                         <id>@execId@</id>
