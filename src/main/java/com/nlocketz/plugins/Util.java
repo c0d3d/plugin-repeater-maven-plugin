@@ -39,7 +39,7 @@ final class Util {
             if (child.getChildCount() == 0) {
                 child.setValue(filter(subs, child.getValue()));
             } else {
-                filter(subs, child);
+                filterInternal(subs, child);
             }
         }
 

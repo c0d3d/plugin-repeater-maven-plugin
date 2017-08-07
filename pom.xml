@@ -137,7 +137,7 @@
                                 <pomInclude>*/pom.xml</pomInclude>
                             </pomIncludes>
                             <postBuildHookScript>verify</postBuildHookScript>
-                            <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+                            <!--<localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>-->
                             <settingsFile>${project.basedir}/src/it/settings.xml</settingsFile>
                             <goals>
                                 <goal>clean</goal>
