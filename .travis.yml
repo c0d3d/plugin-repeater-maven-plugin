@@ -3,4 +3,4 @@ jdk:
   - openjdk7
   - openjdk8
   - oraclejdk8
-script: mvn
+script: mvn -Prun-its
