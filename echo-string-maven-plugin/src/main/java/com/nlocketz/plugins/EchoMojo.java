@@ -10,6 +10,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 
 @Mojo(name = "echo", defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class EchoMojo extends AbstractMojo {
@@ -30,7 +31,7 @@ public class EchoMojo extends AbstractMojo {
                 Files.createDirectories(outputPath.getParent());
                 Files.deleteIfExists(outputPath);
                 Files.createFile(outputPath);
-                try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
+                try (BufferedWriter writer = Files.newBufferedWriter(outputPath, StandardCharsets.UTF_8)) {
                     writer.write(toEcho);
                 }
             } catch (IOException e) {
