@@ -12,6 +12,12 @@ final class Util {
     }
 
     public static String filter(Map<String, String> subs, String toFilter) {
+
+        if (toFilter == null) {
+            // Null doesn't filter ...
+            return null;
+        }
+
         String output = toFilter;
 
         // TODO precompiled pattern (or pattern cache)
