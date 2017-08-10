@@ -44,7 +44,6 @@
                                     <str>third file contents!</str>
                                 </repetition>
                             </repetitions>
-                            <goal>echo</goal>
                             <contentPlugin>
                                 <groupId>@project.groupId@</groupId>
                                 <artifactId>echo-string-maven-plugin</artifactId>
@@ -52,6 +51,9 @@
                                 <executions>
                                     <execution>
                                         <id>@execId@</id>
+                                        <goals>
+                                            <goal>echo</goal>
+                                        </goals>
                                         <configuration>
                                             <toEcho>@str@</toEcho>
                                             <toFile>@file@</toFile>

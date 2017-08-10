@@ -20,14 +20,13 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.*;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3DomUtils;
 import org.eclipse.aether.RepositorySystemSession;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,14 +35,12 @@ import static com.nlocketz.plugins.Util.plexusToDom;
 /**
  * Mojo which will run your repetitions
  */
-@Mojo(name = "repeat", defaultPhase = LifecyclePhase.PROCESS_SOURCES, configurator = "custom-basic")
+@Mojo(name = "repeat",
+        defaultPhase = LifecyclePhase.PROCESS_SOURCES,
+        configurator = "custom-basic",
+        instantiationStrategy = InstantiationStrategy.SINGLETON)
 public class RepetitionMojo
         extends AbstractMojo {
-    /**
-     * The goal to call in the repeated plugin.
-     */
-    @Parameter(property = "goal", required = true)
-    private String goal;
 
     /**
      * Substitutions we will need to make.
@@ -82,15 +79,18 @@ public class RepetitionMojo
         }
     }
 
-    private RepetitionConfigPlugin substituteIn(Map<String, String> subs, RepetitionConfigPlugin original) {
+    private RepetitionConfigPlugin substituteIn(Map<String, String> subs, RepetitionConfigPlugin original)
+            throws MojoExecutionException {
         return original.substitute(subs);
     }
 
     private void executeSubstitution(RepetitionConfigPlugin subbed) throws MojoExecutionException {
         for (RepetitionExecution execution : subbed.getExecutions()) {
             try {
-                MojoExecution mojoDescriptor = loadMojoDescriptor(subbed, execution);
-                pluginBuildManager.executeMojo(mavenSession, mojoDescriptor);
+                List<MojoExecution> mojoExecutions = loadMojoExecutions(subbed, execution);
+                for (MojoExecution execs : mojoExecutions) {
+                    pluginBuildManager.executeMojo(mavenSession, execs);
+                }
             } catch (MojoFailureException
                     | PluginConfigurationException
                     | PluginManagerException
@@ -100,11 +100,13 @@ public class RepetitionMojo
                     | PluginDescriptorParsingException e) {
 
                 throw new MojoExecutionException("Failed to repeat execution!", e);
+            } catch (Exception e) {
+                getLog().error(e);
             }
         }
     }
 
-    private MojoExecution loadMojoDescriptor(RepetitionConfigPlugin subbed, RepetitionExecution execution) throws
+    private List<MojoExecution> loadMojoExecutions(RepetitionConfigPlugin subbed, RepetitionExecution execution) throws
             InvalidPluginDescriptorException,
             PluginResolutionException,
             PluginDescriptorParsingException,
@@ -119,17 +121,24 @@ public class RepetitionMojo
                         mavenProject.getRemotePluginRepositories(),
                         repositorySession);
 
-        MojoDescriptor mojoDescriptor = pDesc.getMojo(goal);
-
-        if (mojoDescriptor == null) {
-            throw new MojoExecutionException("Goal "+goal+" doesn't exist for plugin " + subbed.toGav());
+        List<MojoDescriptor> descriptors = new ArrayList<>();
+        for (String goal : execution.getGoals()) {
+            MojoDescriptor mojoDescriptor = pDesc.getMojo(goal);
+            if (mojoDescriptor == null) {
+                throw new MojoExecutionException("Goal "+goal+" doesn't exist for plugin " + subbed.toGav());
+            }
+            descriptors.add(mojoDescriptor);
         }
 
-        return new MojoExecution(
-                mojoDescriptor,
-                Xpp3DomUtils.mergeXpp3Dom(
-                        plexusToDom(execution.getConfiguration()),
-                        plexusToDom(mojoDescriptor.getMojoConfiguration())));
+        List<MojoExecution> executions = new ArrayList<>();
+        for (MojoDescriptor desc : descriptors) {
+            executions.add(new MojoExecution(desc,
+                    Xpp3DomUtils.mergeXpp3Dom(
+                            plexusToDom(execution.getConfiguration()),
+                            plexusToDom(desc.getMojoConfiguration()))));
+        }
+
+        return executions;
     }
 
 

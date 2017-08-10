@@ -2,6 +2,7 @@ package com.nlocketz.plugins;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +22,7 @@ public class RepetitionConfigPlugin {
 
     // TODO we should be able to make "mutable string" slots and just set them for each rep
     // so only 1 traverse to put mut strings in place
-    RepetitionConfigPlugin substitute(Map<String, String> vars) {
+    RepetitionConfigPlugin substitute(Map<String, String> vars) throws MojoExecutionException {
         RepetitionConfigPlugin output = new RepetitionConfigPlugin();
         output.version = version;
         output.artifactId = artifactId;
