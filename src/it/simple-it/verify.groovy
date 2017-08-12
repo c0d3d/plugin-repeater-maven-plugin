@@ -4,6 +4,6 @@ void assertFileWith(String path, String contents) {
     assert expectedFile.text == contents
 }
 
-assertFileWith("one", "first file contents!")
-assertFileWith("two", "second file contents!")
-assertFileWith("three", "third file contents!")
+assertFileWith("1", "first file contents!")
+assertFileWith("2", "second file contents!")
+assertFileWith("3", "third file contents!")

@@ -16,22 +16,33 @@ public class RepetitionConfigPlugin {
     private String version;
     private List<RepetitionExecution> executions;
 
+    /**
+     * Copy constructor.
+     * @param other The other plugin to copy.
+     */
+    public RepetitionConfigPlugin(RepetitionConfigPlugin other) {
+        this.groupId = other.groupId;
+        this.artifactId = other.artifactId;
+        this.version = other.version;
+        this.executions = new ArrayList<>();
+        for (RepetitionExecution execution : other.getExecutions()) {
+            this.executions.add(new RepetitionExecution(execution));
+        }
+    }
+
+    public RepetitionConfigPlugin() {
+        // For SISU
+    }
+
+
     List<RepetitionExecution> getExecutions() {
         return executions;
     }
 
-    // TODO we should be able to make "mutable string" slots and just set them for each rep
-    // so only 1 traverse to put mut strings in place
-    RepetitionConfigPlugin substitute(Map<String, String> vars) throws MojoExecutionException {
-        RepetitionConfigPlugin output = new RepetitionConfigPlugin();
-        output.version = version;
-        output.artifactId = artifactId;
-        output.groupId = groupId;
-        output.executions = new ArrayList<>(executions.size());
+    void substitute(Map<String, String> vars) throws MojoExecutionException {
         for (RepetitionExecution exec : executions) {
-            output.executions.add(exec.sub(vars));
+            exec.sub(vars);
         }
-        return output;
     }
 
     Plugin asPlugin() {

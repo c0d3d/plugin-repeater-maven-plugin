@@ -1,4 +1,4 @@
-# Plugin repeater maven plugin [![Build Status](https://travis-ci.org/c0d3d/plugin-repeater-maven-plugin.svg?branch=master)](https://travis-ci.org/c0d3d/plugin-repeater-maven-plugin)
+# Plugin repeater maven plugin [![Build Status](https://travis-ci.org/c0d3d/plugin-repeater-maven-plugin.svg?branch=master)](https://travis-ci.org/c0d3d/plugin-repeater-maven-plugin) [![Maven Central](https://img.shields.io/maven-central/v/com.nlocketz.plugins/plugin-repeater-maven-plugin.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.nlocketz.plugins%22%20a%3A%22plugin-repeater-maven-plugin%22)
 
 The plugin repeater maven plugin allows you to follow the [DRY principal](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) when writing your POM files.
 

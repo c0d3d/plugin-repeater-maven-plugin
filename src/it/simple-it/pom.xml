@@ -21,6 +21,46 @@
                 <version>@project.version@</version>
                 <executions>
                     <execution>
+                        <id>rep-diff-phase</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>repeat</goal>
+                        </goals>
+                        <configuration>
+                            <!--<rules>-->
+                                <!--<defaults>-->
+                                    <!--<str>default string</str>-->
+                                <!--</defaults>-->
+                            <!--</rules>-->
+                            <repetitions>
+                                <repetition>
+                                    <execId>default-test-1</execId>
+                                    <file>target/default-test-1</file>
+                                    <!-- This should be filled out by the default! -->
+                                    <!-- <str>second file contents!</str> -->
+                                </repetition>
+                            </repetitions>
+                            <contentPlugin>
+                                <groupId>@project.groupId@</groupId>
+                                <artifactId>echo-string-maven-plugin</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                                <executions>
+                                    <execution>
+                                        <id>@execId@</id>
+                                        <goals>
+                                            <goal>echo</goal>
+                                        </goals>
+                                        <phase>generate-sources</phase>
+                                        <configuration>
+                                            <toEcho>@str@</toEcho>
+                                            <toFile>@file@</toFile>
+                                        </configuration>
+                                    </execution>
+                                </executions>
+                            </contentPlugin>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>rep</id>
                         <phase>validate</phase>
                         <goals>
@@ -29,18 +69,18 @@
                         <configuration>
                             <repetitions>
                                 <repetition>
-                                    <execId>one</execId>
-                                    <file>target/one</file>
+                                    <execId>1</execId>
+                                    <file>target/1</file>
                                     <str>first file contents!</str>
                                 </repetition>
                                 <repetition>
-                                    <execId>two</execId>
-                                    <file>target/two</file>
+                                    <execId>2</execId>
+                                    <file>target/2</file>
                                     <str>second file contents!</str>
                                 </repetition>
                                 <repetition>
-                                    <execId>three</execId>
-                                    <file>target/three</file>
+                                    <execId>3</execId>
+                                    <file>target/3</file>
                                     <str>third file contents!</str>
                                 </repetition>
                             </repetitions>

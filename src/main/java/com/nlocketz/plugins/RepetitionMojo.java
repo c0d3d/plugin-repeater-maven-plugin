@@ -16,12 +16,25 @@ package com.nlocketz.plugins;
  * limitations under the License.
  */
 
+
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.PluginConfigurationException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginManagerException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3DomUtils;
 import org.eclipse.aether.RepositorySystemSession;
@@ -37,8 +50,7 @@ import static com.nlocketz.plugins.Util.plexusToDom;
  */
 @Mojo(name = "repeat",
         defaultPhase = LifecyclePhase.PROCESS_SOURCES,
-        configurator = "custom-basic",
-        instantiationStrategy = InstantiationStrategy.SINGLETON)
+        configurator = "custom-basic")
 public class RepetitionMojo
         extends AbstractMojo {
 
@@ -47,6 +59,12 @@ public class RepetitionMojo
      */
     @Parameter(property = "repetitions", required = true)
     private List<Map<String, String>> repetitions;
+
+    /**
+     * Substitution Rules
+     */
+    @Parameter(property = "rules")
+    private SubstitutionRules rules;
 
     /**
      * The plugin that will need to be repeated.
@@ -72,16 +90,19 @@ public class RepetitionMojo
     @Component
     private MavenSession mavenSession;
 
+    /**
+     * The running {@link MojoExecution}
+     */
+    @Component
+    private MojoExecution currentExecution;
+
     public void execute()
             throws MojoExecutionException {
         for (Map<String, String> sub : repetitions) {
-            executeSubstitution(substituteIn(sub, contentPlugin));
+            RepetitionConfigPlugin copy = new RepetitionConfigPlugin(contentPlugin);
+            copy.substitute(sub);
+            executeSubstitution(copy);
         }
-    }
-
-    private RepetitionConfigPlugin substituteIn(Map<String, String> subs, RepetitionConfigPlugin original)
-            throws MojoExecutionException {
-        return original.substitute(subs);
     }
 
     private void executeSubstitution(RepetitionConfigPlugin subbed) throws MojoExecutionException {
@@ -125,17 +146,20 @@ public class RepetitionMojo
         for (String goal : execution.getGoals()) {
             MojoDescriptor mojoDescriptor = pDesc.getMojo(goal);
             if (mojoDescriptor == null) {
-                throw new MojoExecutionException("Goal "+goal+" doesn't exist for plugin " + subbed.toGav());
+                throw new MojoExecutionException("Goal " + goal + " doesn't exist for plugin " + subbed.toGav());
             }
+            mojoDescriptor.setPhase(
+                    execution.getPhase() == null ? currentExecution.getLifecyclePhase() : execution.getPhase());
             descriptors.add(mojoDescriptor);
         }
 
         List<MojoExecution> executions = new ArrayList<>();
         for (MojoDescriptor desc : descriptors) {
-            executions.add(new MojoExecution(desc,
+            MojoExecution exec = new MojoExecution(desc,
                     Xpp3DomUtils.mergeXpp3Dom(
                             plexusToDom(execution.getConfiguration()),
-                            plexusToDom(desc.getMojoConfiguration()))));
+                            plexusToDom(desc.getMojoConfiguration())));
+            executions.add(exec);
         }
 
         return executions;
