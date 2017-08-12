@@ -40,6 +40,7 @@ import org.codehaus.plexus.util.xml.Xpp3DomUtils;
 import org.eclipse.aether.RepositorySystemSession;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -99,9 +100,21 @@ public class RepetitionMojo
     public void execute()
             throws MojoExecutionException {
         for (Map<String, String> sub : repetitions) {
-            RepetitionConfigPlugin copy = new RepetitionConfigPlugin(contentPlugin);
-            copy.substitute(sub);
-            executeSubstitution(copy);
+
+            // A copy of the plugin for the current run.
+            RepetitionConfigPlugin currentRunPlugin = new RepetitionConfigPlugin(contentPlugin);
+
+            // A copy of the substitutions for the current run.
+            Map<String, String> withRules = new HashMap<>(sub);
+
+            // Apply the rules.
+            rules.apply(withRules, currentRunPlugin);
+
+            // Apply rules-compliant substitutions
+            currentRunPlugin.substitute(withRules);
+
+            // ... and GO!
+            executeSubstitution(currentRunPlugin);
         }
     }
 

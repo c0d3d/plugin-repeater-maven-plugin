@@ -27,17 +27,22 @@
                             <goal>repeat</goal>
                         </goals>
                         <configuration>
-                            <!--<rules>-->
-                                <!--<defaults>-->
-                                    <!--<str>default string</str>-->
-                                <!--</defaults>-->
-                            <!--</rules>-->
+                            <rules>
+                                <defaults>
+                                    <str>default string</str>
+                                </defaults>
+                            </rules>
                             <repetitions>
                                 <repetition>
                                     <execId>default-test-1</execId>
                                     <file>target/default-test-1</file>
                                     <!-- This should be filled out by the default! -->
                                     <!-- <str>second file contents!</str> -->
+                                </repetition>
+                                <repetition>
+                                    <execId>default-test-2</execId>
+                                    <file>target/default-test-2</file>
+                                    <str>override string</str>
                                 </repetition>
                             </repetitions>
                             <contentPlugin>

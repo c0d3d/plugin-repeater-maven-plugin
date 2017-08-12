@@ -1,5 +1,6 @@
 package com.nlocketz.plugins;
 
+import com.google.common.collect.ImmutableMap;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -11,11 +12,12 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class FilteringTest {
-    private Map<String, String> varMap = map(
-            "string-one", "1",
-            "string-two", "2",
-            "nameThree", "three",
-            "4", "name-four");
+    private Map<String, String> varMap =
+            ImmutableMap.of(
+                    "string-one", "1",
+                    "string-two", "2",
+                    "nameThree", "three",
+                    "4", "name-four");
 
     private List<String> varNames = new ArrayList<>(varMap.keySet());
 
@@ -24,21 +26,6 @@ public class FilteringTest {
 
     private String randVarName() {
         return varNames.get(r.nextInt(varNames.size()));
-    }
-
-    private Map<String, String> map(String ... entries) {
-        if ((entries.length & 1) != 0) {
-            throw new IllegalArgumentException("Entries must be key1,value1,key2,value2 ... etc. Given odd number!");
-        }
-
-        Map<String, String> result = new HashMap<>();
-
-        // Always aligned properly due to check above.
-        for (int i = 0; i < entries.length; i+=2) {
-            result.put(entries[i], entries[i+1]);
-        }
-
-        return Collections.unmodifiableMap(result);
     }
 
     private Xpp3Dom domOf(String contents) {
