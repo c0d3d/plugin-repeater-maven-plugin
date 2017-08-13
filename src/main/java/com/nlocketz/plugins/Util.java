@@ -65,6 +65,11 @@ final class Util {
     }
 
     static Xpp3Dom plexusToDom(PlexusConfiguration config) {
+
+        if (config == null) {
+            return null;
+        }
+
         Xpp3Dom output = new Xpp3Dom(config.getName());
         output.setValue(config.getValue(null));
         for (String attrName : config.getAttributeNames()) {

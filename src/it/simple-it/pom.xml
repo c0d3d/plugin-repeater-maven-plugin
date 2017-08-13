@@ -7,7 +7,7 @@
     <artifactId>simple-it</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <description>A simple IT verifying the basic use case.</description>
+    <description>A simple IT verifying the basic use cases.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,6 +20,159 @@
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
                 <executions>
+                    <execution>
+                        <id>default-conditional-include-rep</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>repeat</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <defaults>
+                                    <file>target/default-conditional-test-1</file>
+                                </defaults>
+                            </rules>
+                            <repetitions>
+                                <repetition>
+                                    <execId>default-conditional-test-1</execId>
+                                    <!-- Defaults are visible to conditionals -->
+                                    <str>This should *not* be written to the log!</str>
+                                </repetition>
+                                <repetition>
+                                    <execId>default-conditional-test-2</execId>
+                                    <file>target/default-conditional-test-2</file>
+                                    <str>This should be in the file!</str>
+                                </repetition>
+                            </repetitions>
+                            <contentPlugin>
+                                <groupId>@project.groupId@</groupId>
+                                <artifactId>echo-string-maven-plugin</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                                <executions>
+                                    <execution>
+                                        <id>@execId@</id>
+                                        <goals>
+                                            <goal>echo</goal>
+                                        </goals>
+                                        <phase>generate-sources</phase>
+                                        <configuration>
+                                            <toEcho>@str@</toEcho>
+                                            <toFile if="file">@file@</toFile>
+                                        </configuration>
+                                    </execution>
+                                </executions>
+                            </contentPlugin>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compound-conditional-include-rep</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>repeat</goal>
+                        </goals>
+                        <configuration>
+                            <repetitions>
+                                <repetition>
+                                    <execId>compound-conditional-test-1</execId>
+                                    <str>This should be written to the log!</str>
+                                    <!-- Both fail here. -->
+                                    <no-file>anything</no-file>
+                                </repetition>
+                                <repetition>
+                                    <execId>conditional-test-2</execId>
+                                    <file>target/compound-conditional-test-2</file>
+                                    <!-- This will not be written since unless fails. -->
+                                    <str>This should be in the file!</str>
+                                    <no-file>anything</no-file>
+                                </repetition>
+                                <reptition>
+                                    <execId>compound-conditional-test-3</execId>
+                                    <str>This should be in the other-file!</str>
+                                    <!-- This will not be written since if fails. -->
+                                    <other-file>target/compound-conditional-test-3</other-file>
+                                </reptition>
+                                <repetition>
+                                    <execId>conditional-test-4</execId>
+                                    <file>target/compound-conditional-test-4</file>
+                                    <str>This should be in the file!</str>
+                                </repetition>
+                            </repetitions>
+                            <contentPlugin>
+                                <groupId>@project.groupId@</groupId>
+                                <artifactId>echo-string-maven-plugin</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                                <executions>
+                                    <execution>
+                                        <id>@execId@</id>
+                                        <goals>
+                                            <goal>echo</goal>
+                                        </goals>
+                                        <phase>generate-sources</phase>
+                                        <configuration>
+                                            <toEcho>@str@</toEcho>
+                                            <toFile if="file" unless="no-file">@file@</toFile>
+                                        </configuration>
+                                    </execution>
+                                </executions>
+                            </contentPlugin>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>conditional-include-rep</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>repeat</goal>
+                        </goals>
+                        <configuration>
+                            <repetitions>
+                                <repetition>
+                                    <execId>conditional-test-1</execId>
+                                    <str>This should be written to the log!</str>
+                                    <no-file>anything</no-file>
+                                </repetition>
+                                <repetition>
+                                    <execId>conditional-test-2</execId>
+                                    <file>target/conditional-test-2</file>
+                                    <str>This should be in the file!</str>
+                                    <no-file>anything</no-file>
+                                </repetition>
+                                <reptition>
+                                    <execId>conditional-test-3</execId>
+                                    <str>This should be in the other-file!</str>
+                                    <other-file>target/conditional-test-3</other-file>
+                                </reptition>
+                            </repetitions>
+                            <contentPlugin>
+                                <groupId>@project.groupId@</groupId>
+                                <artifactId>echo-string-maven-plugin</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                                <executions>
+                                    <execution>
+                                        <id>@execId@</id>
+                                        <goals>
+                                            <goal>echo</goal>
+                                        </goals>
+                                        <phase>generate-sources</phase>
+                                        <configuration>
+                                            <toEcho>@str@</toEcho>
+                                            <toFile unless="no-file">@other-file@</toFile>
+                                        </configuration>
+                                    </execution>
+                                    <execution>
+                                        <id>@execId@</id>
+                                        <goals>
+                                            <goal>echo</goal>
+                                        </goals>
+                                        <phase>generate-sources</phase>
+                                        <configuration>
+                                            <toEcho>@str@</toEcho>
+                                            <toFile if="file">@file@</toFile>
+                                        </configuration>
+                                    </execution>
+                                </executions>
+                            </contentPlugin>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>rep-diff-phase</id>
                         <phase>validate</phase>
