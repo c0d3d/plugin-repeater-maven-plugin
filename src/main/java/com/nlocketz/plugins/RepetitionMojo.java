@@ -36,6 +36,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomUtils;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -57,9 +58,10 @@ public class RepetitionMojo
 
     /**
      * Substitutions we will need to make.
+     * This can be arbitrarily nested. Every leaf indicates one repetition
      */
     @Parameter(property = "repetitions", required = true)
-    private List<Map<String, String>> repetitions;
+    private PlexusConfiguration repetitions;
 
     /**
      * Substitution Rules
@@ -99,7 +101,8 @@ public class RepetitionMojo
 
     public void execute()
             throws MojoExecutionException {
-        for (Map<String, String> sub : repetitions) {
+        List<Map<String, String>> repetitionsParsed = RepetitionParser.parseRepetitions(repetitions);
+        for (Map<String, String> sub : repetitionsParsed) {
 
             // A copy of the plugin for the current run.
             RepetitionConfigPlugin currentRunPlugin = new RepetitionConfigPlugin(contentPlugin);
@@ -117,6 +120,7 @@ public class RepetitionMojo
             executeSubstitution(currentRunPlugin);
         }
     }
+
 
     private void executeSubstitution(RepetitionConfigPlugin subbed) throws MojoExecutionException {
         for (RepetitionExecution execution : subbed.getExecutions()) {

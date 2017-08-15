@@ -85,12 +85,12 @@
                                     <str>This should be in the file!</str>
                                     <no-file>anything</no-file>
                                 </repetition>
-                                <reptition>
+                                <repetition>
                                     <execId>compound-conditional-test-3</execId>
                                     <str>This should be in the other-file!</str>
                                     <!-- This will not be written since if fails. -->
                                     <other-file>target/compound-conditional-test-3</other-file>
-                                </reptition>
+                                </repetition>
                                 <repetition>
                                     <execId>conditional-test-4</execId>
                                     <file>target/compound-conditional-test-4</file>
@@ -136,11 +136,11 @@
                                     <str>This should be in the file!</str>
                                     <no-file>anything</no-file>
                                 </repetition>
-                                <reptition>
+                                <repetition>
                                     <execId>conditional-test-3</execId>
                                     <str>This should be in the other-file!</str>
                                     <other-file>target/conditional-test-3</other-file>
-                                </reptition>
+                                </repetition>
                             </repetitions>
                             <contentPlugin>
                                 <groupId>@project.groupId@</groupId>
