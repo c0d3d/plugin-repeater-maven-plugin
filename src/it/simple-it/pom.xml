@@ -21,6 +21,64 @@
                 <version>@project.version@</version>
                 <executions>
                     <execution>
+                        <id>group-rep</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>repeat</goal>
+                        </goals>
+                        <configuration>
+                            <repetitions>
+                                <repetitionGroup>
+                                    <file>target/repetition-test-file1</file>
+                                    <repetitionGroup>
+                                        <file>target/repetition-test-file2</file>
+                                        <repetition>
+                                            <file>target/repetition-test-file3</file>
+                                            <str>group file 3!</str>
+                                        </repetition>
+                                        <repetition>
+                                            <str>group file 2!</str>
+                                        </repetition>
+                                    </repetitionGroup>
+                                    <repetition>
+                                        <str>group file 1!</str>
+                                    </repetition>
+                                </repetitionGroup>
+                                <repetition>
+                                    <file>target/repetition-test-file0</file>
+                                    <str>group file 0!</str>
+                                </repetition>
+                                <repetitionGroup>
+                                    <str>Shared default</str>
+                                    <repetition>
+                                        <file>target/repetition-test-file4</file>
+                                    </repetition>
+                                    <repetition>
+                                        <file>target/repetition-test-file5</file>
+                                    </repetition>
+                                </repetitionGroup>
+                            </repetitions>
+                            <contentPlugin>
+                                <groupId>@project.groupId@</groupId>
+                                <artifactId>echo-string-maven-plugin</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                                <executions>
+                                    <execution>
+                                        <id>@execId@</id>
+                                        <goals>
+                                            <goal>echo</goal>
+                                        </goals>
+                                        <phase>generate-sources</phase>
+                                        <configuration>
+                                            <toEcho>@str@</toEcho>
+                                            <toFile>@file@</toFile>
+                                        </configuration>
+                                    </execution>
+                                </executions>
+                            </contentPlugin>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>default-conditional-include-rep</id>
                         <phase>validate</phase>
                         <goals>
