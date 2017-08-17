@@ -105,6 +105,39 @@ public class GroupRepetitionTest {
                         rep(p("d", "e")))));
     }
 
+    @Test
+    public void test3Nest() {
+        assertParseTo(ImmutableList.<Map<String, String>>of(
+                ImmutableMap.of(
+                        "one", "one",
+                        "two", "two",
+                        "three", "three",
+                        "four", "four")),
+                base(grp(p("one", "one"),
+                        grp(p("two", "two"),
+                                grp(p("three", "three"),
+                                        rep(p("four", "four")))))));
+    }
+
+    @Test
+    public void test1Filter() {
+        assertParseTo(ImmutableList.<Map<String, String>>of(
+                ImmutableMap.of("one", "twenty two")),
+                base(grp(p("one", "two"),
+                        rep(p("one", "twenty @one@")))));
+    }
+
+    @Test
+    public void test2Filter2Nest() {
+        assertParseTo(ImmutableList.<Map<String, String>>of(
+                ImmutableMap.of(
+                        "one", "twenty two",
+                        "two", "twenty")),
+                base(grp(p("one", "two"),
+                        grp(p("two", "twenty"),
+                                rep(p("one", "@two@ @one@"))))));
+    }
+
     private void assertParseTo(List<Map<String, String>>  expectedVars, PlexusConfiguration p) {
         assertEquals(expectedVars, RepetitionParser.parseRepetitions(p));
     }

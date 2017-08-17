@@ -43,7 +43,7 @@ public class RepetitionParser {
 
             List<Map<String, String>> childInstances = Lists.newArrayList();
             for (PlexusConfiguration child : children) {
-                childInstances.addAll(parse(child, leafChildren));
+                childInstances.addAll(parse(child, instance(bound, leafChildren)));
             }
 
             return childInstances;
@@ -62,7 +62,7 @@ public class RepetitionParser {
                                          Map<String, String> base) {
         Map<String, String> varInstance = Maps.newHashMap(bound);
         varInstance.putAll(base);
-        return varInstance;
+        return Util.filterVars(bound, varInstance);
     }
 
     private static Map<String, String> partitionOnLeaves(List<PlexusConfiguration> children) {

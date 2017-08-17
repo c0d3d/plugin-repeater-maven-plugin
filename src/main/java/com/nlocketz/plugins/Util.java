@@ -1,5 +1,6 @@
 package com.nlocketz.plugins;
 
+import com.google.common.collect.Maps;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -62,6 +63,15 @@ final class Util {
         filterInternal(subs, output);
 
         return output;
+    }
+
+    static Map<String, String> filterVars(Map<String, String> vars, Map<String, String> target) {
+        Map<String, String> filtered = Maps.newHashMap(target);
+        for (Map.Entry<String, String> e : target.entrySet()) {
+            filtered.put(e.getKey(),
+                    filter(vars, e.getValue()));
+        }
+        return filtered;
     }
 
     static Xpp3Dom plexusToDom(PlexusConfiguration config) {
