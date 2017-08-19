@@ -6,9 +6,9 @@ If you've ever had to write a very similar plugin execution dozens of times then
 
 The plugin repeater plugin lets you repeat a plugin execution with different variables substituted.
 
-#### Example
+The following examples assume that we have a fictional plugin, `adder-maven-plugin`, that adds numbers.
 
-The following example assume that we have a fictional plugin, `adder-maven-plugin`, that adds numbers.
+#### Simple Example
 
 Say we wanted to add 5 sets of two numbers. Normally you'd have to write something like this:
 
@@ -108,8 +108,6 @@ With the plugin repeater maven plugin you can just write:
                             <nTwo>10</nTwo>
                         </repetition>
                     </repetitions>
-                    <!-- The goal to run in the sub-plugin -->
-                    <goal>add</goal>
                     <contentPlugin>
                         <groupId>fake.plugin.group</groupId>
                         <artifactId>adder-maven-plugin</artifactId>
@@ -117,6 +115,14 @@ With the plugin repeater maven plugin you can just write:
                         <executions>
                             <execution>
                                 <id>repeat-add</id>
+                                <goals>
+                                    <!-- Every goal will be run. -->
+                                    <!-- the adder-maven-plugin only has one goal -->
+                                    <goal>add</goal>
+                                </goals>
+                                <!-- NOTE: Due to a limitation of the maven plugin API -->
+                                <!-- this doesn't support the phase tag. All the executions -->
+                                <!-- are run in the same phase as your plugin-repeator-maven-plugin -->
                                 <configuration>
                                     <!-- These @ surrounded variables are replaced with their -->
                                     <!-- corresponding values during each repetition. -->
@@ -130,3 +136,165 @@ With the plugin repeater maven plugin you can just write:
             </execution>
         </executions>
     </plugin>
+
+#### Default variable groups example (`repetitionGroup`)
+
+If you have some repetitions that all use a certain variable with a certain value, except 1, you'd have to repeat that variable in the repetitions (violating the DRY principal).
+Fear not! We have thought of this, and added a feature called `repetitionGroup`s that allow you to set defaults for certain repetitions, and override it for others.
+
+Here is an example:
+
+    <!-- Boilerplate omitted -->
+    <execution>
+        <id>run-addings</id>
+        <goals>
+            <goal>repeat</goal>
+        </goals>
+        <configuration>
+            <repetitions>
+                <repetitionGroup>
+                    <!-- Here we set a default for 'nOne'. -->
+                    <!-- If any repetitions nested inside this repetitionGroup -->
+                    <!-- *don't* declare 'nOne', it will be supplied by the most recent default. -->
+                    <!-- In this case that is the top level repetition group, and 2. -->
+                    <nOne>2</nOne>
+                    <repetition>
+                        <nTwo>2</nTwo>
+                    </repetition>
+                    <reptition>
+                        <nTwo>3</nTwo>
+                    </reptition>
+                    <repetition>
+                        <nTwo>4</nTwo>
+                        <nOne>4</nOne>
+                    </repetition>
+                </repetitionGroup>
+            </repetitions>
+            ...
+            <!-- Same as before ... -->
+            ...
+        </configuration>
+    </execution>
+
+which is equivalent to:
+
+    <!-- Boilerplate omitted -->
+    <executions>
+        <execution>
+            <!-- NOTE: even though these have the same execution ID -->
+            <!-- they will all be run inside the plugin-repeater-maven-plugin -->
+            <id>repeat-add</id>
+            <goals>
+                <goal>add</goal>
+            </goals>
+            <configuration>
+                <numberOne>2</numberOne>
+                <numberTwo>2</numberTwo>
+            </configuration>
+        </execution>
+        <execution>
+            <id>repeat-add</id>
+            <goals>
+                <goal>add</goal>
+            </goals>
+            <configuration>
+                <numberOne>2</numberOne>
+                <numberTwo>3</numberTwo>
+            </configuration>
+        </execution>
+        <execution>
+            <id>repeat-add</id>
+            <goals>
+                <goal>add</goal>
+            </goals>
+            <configuration>
+                <numberOne>4</numberOne>
+                <numberTwo>4</numberTwo>
+            </configuration>
+        </execution>
+    </executions>
+
+You can even nest these as deeply as you want!
+
+    <!-- Boilerplate omitted -->
+    <execution>
+        <id>run-addings</id>
+        <goals>
+            <goal>repeat</goal>
+        </goals>
+        <configuration>
+            <repetitions>
+                <repetitionGroup>
+                    <nOne>2</nOne>
+                    <repetitionGroup>
+                        <nTwo>2</nTwo>
+                        <repetition>
+                            <nOne>10</nOne>
+                        </repetition>
+                    </repetitionGroup>
+                    <repetition>
+                        <nTwo>-1</nTwo>
+                    </repetition>
+                </repetitionGroup>
+            </repetitions>
+            ...
+            <!-- Same as before ... -->
+            ...
+        </configuration>
+    </execution>
+
+is equivalent to:
+
+    <!-- Boilerplate omitted -->
+    <executions>
+        <execution>
+            <id>repeat-add</id>
+            <goals>
+                <goal>add</goal>
+            </goals>
+            <configuration>
+                <numberOne>10</numberOne>
+                <numberTwo>2</numberTwo>
+            </configuration>
+        </execution>
+        <execution>
+            <id>repeat-add</id>
+            <goals>
+                <goal>add</goal>
+            </goals>
+            <configuration>
+                <numberOne>2</numberOne>
+                <numberTwo>-1</numberTwo>
+            </configuration>
+        </execution>
+    <executions>
+
+##### Small gotchya
+
+Due to limitations on maven's xml, you cannot currently do something like this:
+
+    <!-- Boilerplate omitted -->
+    <execution>
+        <id>run-addings</id>
+        <goals>
+            <goal>repeat</goal>
+        </goals>
+        <configuration>
+            <repetitions>
+                <repetitionGroup>
+                    <nOne>2</nOne>
+                    <repetitionGroup>
+                        <nTwo>2</nTwo>
+                        <!-- neither of the following tags will be recognized! -->
+                        <!-- Even though they are unambiguous in terms of their intention -->
+                        <repetition/>
+                        <repetition>
+                        </repetition>
+                    </repetitionGroup>
+                </repetitionGroup>
+            </repetitions>
+            ...
+            <!-- Same as before ... -->
+            ...
+        </configuration>
+    </execution>
