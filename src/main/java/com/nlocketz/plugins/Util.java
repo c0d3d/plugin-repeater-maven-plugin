@@ -25,7 +25,8 @@ final class Util {
         for (String varName : subs.keySet()) {
             String varExpr = String.format("@%s@", varName);
             if (output.contains(varExpr)) {
-                output = output.replaceAll(varExpr, subs.get(varName));
+                String sub = subs.get(varName);
+                output = output.replaceAll(varExpr, sub == null ? "" : sub);
             }
         }
 
